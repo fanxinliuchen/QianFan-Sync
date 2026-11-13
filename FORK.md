@@ -9,9 +9,10 @@
 
 **上游只动 `master`，你只动 `dev`，中间靠 rebase 把你的改动「抬到」最新上游之上。**
 
-- 不做 fork 也能跟踪上游，但建议加一个自己的远程仓库做备份。
+- 你的 fork（`fanxinliuchen/QianFan-Sync`）只当**备份盘**用，同步动作永远在本地做。
 - 同步的动作只有一条命令：`./sync-upstream.sh`
 - **绝对不要**在 `start.bat` 的「是否更新」提示里按 `Y`（原因见第四节）。
+- GitHub 网页上的 `Sync fork` 按钮**不是必需环节**，别把它当成同步手段（原因见第八节）。
 
 ---
 
@@ -20,7 +21,7 @@
 | 项 | 值 | 说明 |
 |---|---|---|
 | `upstream` 远程 | `ghproxy.net` 镜像 → 官方仓库 | 直连 GitHub 不通，走镜像；push 地址被设为 `NO_PUSH_ALLOWED` 防误推 |
-| `origin` 远程 | 未配置 | 留给**你自己的仓库**，见第七节 |
+| `origin` 远程 | `github.com/fanxinliuchen/QianFan-Sync`（你的 fork） | `dev` 推到这里做备份；`master` 也推了一份镜像 |
 | `master` 分支 | 与上游完全一致，跟踪 `upstream/master` | **只做只读镜像，永远不在这里提交** |
 | `dev` 分支 | 当前所在分支 | **所有二次开发都在这里做** |
 | 下载源 | 脚本内置 3 个候选，自动探测 | ghproxy.net / ghfast.top / 直连 GitHub，按序探测，失效自动切换 |
@@ -190,18 +191,23 @@ git rebase --continue
 
 ---
 
-## 七、给自己的改动上保险：配置 `origin`
+## 七、改动备份：`origin` 已接上你的 fork
 
-本地只有一份 `dev` 分支是有风险的（磁盘坏了就全没了）。建议建一个**私有**仓库当备份：
+本地只有一份 `dev` 分支是有风险的（磁盘坏了就全没了），所以 `origin` 已指向你自己的 fork：
 
-```bash
-# 在你的 Git 平台（GitHub 私有仓库 / Gitee / 公司 GitLab）新建空仓库后：
-git remote add origin <你的仓库地址>
-git push -u origin master    # 上游镜像基线
-git push -u origin dev       # 你的开发分支
+```
+origin   https://github.com/fanxinliuchen/QianFan-Sync.git   ← 你的，可读可写
+upstream https://ghfast.top/https://github.com/DevilJie/QianFan-Sync.git  ← 官方，只读
 ```
 
-之后每次同步完推送：
+分支跟踪关系是刻意这样设的：
+
+| 本地分支 | 跟踪 | 含义 |
+|---|---|---|
+| `master` | `upstream/master` | 只读镜像，`git status` 直接告诉你落后官方多少 |
+| `dev` | `origin/dev` | 你的开发线，`git status` 告诉你有没有没备份的提交 |
+
+每次同步完把改动推上去：
 
 ```bash
 git push --force-with-lease origin dev
@@ -209,11 +215,45 @@ git push --force-with-lease origin dev
 
 变基会重写提交历史，所以必须强推。用 `--force-with-lease` 而不是 `--force`，它在远端有别人的新提交时会拒绝，避免覆盖。
 
-> 若你用的平台支持，把 `master` 设为保护分支，`dev` 留给自己随便推。
+> 想把 `master` 也更新到 fork 上，`git push origin master` 即可（这条永远不需要强推，因为它是纯镜像）。
 
 ---
 
-## 八、常见问题
+## 八、关于 GitHub 的「Sync fork」按钮
+
+**结论：对二次开发没有实际作用，而且不要依赖它。**
+
+它做的事只有一件：把你 fork 里的**默认分支**（这里是 `master`）快进到上游最新。就这些。
+
+三个关键事实：
+
+**1. 它不碰你的 `dev`。**
+你点一百次 Sync fork，`dev` 分支上的改动也不会自动变基到最新上游。而让改动适配最新上游的动作，只有本地的 `./sync-upstream.sh`。
+
+**2. 你本地的同步根本不经过 fork。**
+`git fetch upstream` 是直连官方仓库拉取的，跟你 fork 的 `master` 是否落后**完全无关**。所以"fork 落后了"这件事，不影响你任何本地操作。
+
+**3. 远程 dev 和本地 dev 是两回事。**
+你推上去的 `origin/dev` 只是备份，同步永远在本地做，做完再强推覆盖它。
+
+### 什么情况下值得点
+
+| 场景 | 值得点吗 |
+|---|---|
+| 日常开发、同步上游 | 不需要 |
+| 想在 GitHub 网页上直观看到「我的 fork 和官方差多少」 | 可以点 |
+| 准备给上游提 PR | 需要，先同步再基于最新发 PR |
+| 只是想仓库列表看起来整洁 | 随你，纯装饰 |
+
+### 一个要避开的风险
+
+如果哪天你把 `dev` 设成了 fork 的**默认分支**，再点 Sync fork，GitHub 会发现 `dev` 上有你自己的提交，提示 `Discard N commits`。手一抖点下去，远程 `dev` 就被重置成上游代码了。
+
+所以：**让 fork 的默认分支始终是 `master`**，`dev` 只作为普通分支存在。这样 Sync fork 按钮永远只会动那个没有你改动的镜像分支，点了也无害。
+
+---
+
+## 九、常见问题
 
 **Q：同步后发现改坏了，怎么回退？**
 每次同步前脚本会自动打一个 `sync-backup-<时间戳>` 标签：
@@ -234,19 +274,21 @@ git reset --hard sync-backup-20261113-090000
 脚本每次运行都会逐个探测，只有可用的才会被采用——实测镜像波动很大（同一天内 ghproxy.net 有时可用有时 502），所以别写死一个源。
 
 **Q：我可以直接改 `master` 分支吗？**
-不要。`master` 是纯镜像，你在上面提交后，下次 rebase 到上游会因为本地历史分叉而变复杂。所有改动放 `dev`。
+不要。`master` 是纯镜像，本地和 fork 上都一样，你在上面提交后，下次 rebase 到上游会因为历史分叉而变复杂。所有改动放 `dev`。同理，也**不要在 GitHub 网页上直接编辑 fork 的 `master`**，那会让镜像失真。
 
 **Q：上游更新太频繁，每周都冲突怎么办？**
 说明你的改动落在高危文件上了（对照第五节表格）。两个选择：一是把改动挪到新增文件里；二是降低同步频率到每两周一次，但每次要解决更多冲突——**频率越高，单次冲突越小**，通常每周同步反而更轻松。
 
 **Q：想给上游提 PR 呢？**
-在同一仓库里从 `dev` 拉一个干净分支，只放那个特性的提交，然后推到你的 fork 发 PR：
+从 `dev` 拉一个干净分支，只放那个特性的提交，推到自己的 fork，然后在 GitHub 上向官方发 PR：
+
 ```bash
 git checkout -b pr/my-feature upstream/master
 git cherry-pick <你的提交>
-git remote set-url --push upstream <你的fork地址>
-git push -u upstream pr/my-feature
+git push -u origin pr/my-feature
 ```
+
+推送后 GitHub 会给出 `Compare & pull request` 链接，目标选 `DevilJie/QianFan-Sync:master`。
 
 **Q：`update.sh` 还能用吗？**
 不能用于更新本项目。它的作用是把代码重置成官方最新版，会抹掉你的改动。只在「我想彻底放弃本地改动、回到纯上游」时才用它。日常同步一律用 `./sync-upstream.sh`。

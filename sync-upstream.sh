@@ -17,13 +17,13 @@ UPSTREAM_BRANCH="master"          # 官方主线
 UPSTREAM_REMOTE="upstream"
 
 # 下载源，按顺序探测，第一个可用的胜出。
-# 镜像放前面：国内直连 GitHub 基本不通，放最后只作兜底。
+# 直连优先（最快最可信），不通时自动退到镜像。
 # 若设置了环境变量 SYNC_SRC，则跳过探测直接用它，例如：
 #   SYNC_SRC=https://kkgithub.com/DevilJie/QianFan-Sync.git ./sync-upstream.sh
 CANDIDATES=(
+  "https://github.com/DevilJie/QianFan-Sync.git"
   "https://ghproxy.net/https://github.com/DevilJie/QianFan-Sync.git"
   "https://ghfast.top/https://github.com/DevilJie/QianFan-Sync.git"
-  "https://github.com/DevilJie/QianFan-Sync.git"
 )
 PROBE_TIMEOUT=12                  # 单个源探测超时（秒）
 
