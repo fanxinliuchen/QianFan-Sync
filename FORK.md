@@ -23,7 +23,7 @@
 | `origin` 远程 | 未配置 | 留给**你自己的仓库**，见第七节 |
 | `master` 分支 | 与上游完全一致，跟踪 `upstream/master` | **只做只读镜像，永远不在这里提交** |
 | `dev` 分支 | 当前所在分支 | **所有二次开发都在这里做** |
-| 下载源 | 脚本内置 3 个候选，自动探测 | 直连 / ghproxy.net / ghfast.top，失效会自动切换 |
+| 下载源 | 脚本内置 3 个候选，自动探测 | ghproxy.net / ghfast.top / 直连 GitHub，按序探测，失效自动切换 |
 
 额外开启的 git 配置（都为长期跟进上游服务）：
 
@@ -223,7 +223,15 @@ git reset --hard sync-backup-20261113-090000
 ```
 
 **Q：镜像挂了、脚本报「所有源都连不上」？**
-编辑 `sync-upstream.sh` 顶部的 `CANDIDATES` 数组，换成当时能用的镜像或你的代理地址。脚本每次运行都会逐个探测，只有可用的才会被采用。
+两个办法：
+
+1. 临时指定一个可用地址（跳过自动探测）：
+   ```bash
+   SYNC_SRC=https://kkgithub.com/DevilJie/QianFan-Sync.git ./sync-upstream.sh
+   ```
+2. 长期修改：编辑 `sync-upstream.sh` 顶部的 `CANDIDATES` 数组。
+
+脚本每次运行都会逐个探测，只有可用的才会被采用——实测镜像波动很大（同一天内 ghproxy.net 有时可用有时 502），所以别写死一个源。
 
 **Q：我可以直接改 `master` 分支吗？**
 不要。`master` 是纯镜像，你在上面提交后，下次 rebase 到上游会因为本地历史分叉而变复杂。所有改动放 `dev`。
