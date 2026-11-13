@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 315" width="680" height="315" role="img">
+<title>合并与变基的历史形状对比</title>
+<desc>上游新增提交后，用 merge 会产生一个额外的合并提交使历史分叉，用 rebase 则把你的提交重放到上游之后，历史保持一条直线。</desc>
+<defs>
+<marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+
+<rect x="0" y="0" width="680" height="315" fill="#FFFFFF"/>
+
+<text x="40" y="52" font-size="13" font-weight="500" fill="#2C2C2A" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">合并 merge</text>
+<text x="40" y="70" font-size="12" fill="#5F5E5A" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">多出一个合并提交，历史分叉后再合流</text>
+
+<text x="40" y="115" font-size="12" fill="#5F5E5A" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">上游</text>
+<path d="M110 110 L392 110" fill="none" stroke="#B4B2A9" stroke-width="1.5" marker-end="url(#ar)"/>
+<circle cx="110" cy="110" r="5" fill="#888780"/>
+<circle cx="172" cy="110" r="5" fill="#888780"/>
+<circle cx="234" cy="110" r="5" fill="#888780"/>
+<circle cx="296" cy="110" r="5" fill="#888780"/>
+<circle cx="358" cy="110" r="5" fill="#888780"/>
+
+<text x="40" y="175" font-size="12" fill="#5F5E5A" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">你的</text>
+<path d="M234 110 L234 170" fill="none" stroke="#B4B2A9" stroke-width="1" stroke-dasharray="3 3"/>
+<path d="M234 170 L440 170" fill="none" stroke="#185FA5" stroke-width="1.5" marker-end="url(#ar)"/>
+<circle cx="300" cy="170" r="5" fill="#185FA5"/>
+<circle cx="360" cy="170" r="5" fill="#185FA5"/>
+<circle cx="428" cy="170" r="5" fill="#DF6B4C"/>
+
+<path d="M362 113 C 396 119, 425 138, 426 161" fill="none" stroke="#DF6B4C" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+<text x="446" y="174" font-size="12" fill="#993C1D" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">多出的合并提交</text>
+
+<line x1="40" y1="205" x2="640" y2="205" stroke="#D3D1C7" stroke-width="0.5"/>
+
+<text x="40" y="238" font-size="13" font-weight="500" fill="#2C2C2A" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">变基 rebase</text>
+<text x="40" y="256" font-size="12" fill="#5F5E5A" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">你的提交被重放到上游之后，历史一条直线</text>
+
+<text x="40" y="283" font-size="12" fill="#5F5E5A" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">全部</text>
+<path d="M110 278 L512 278" fill="none" stroke="#B4B2A9" stroke-width="1.5" marker-end="url(#ar)"/>
+<circle cx="110" cy="278" r="5" fill="#888780"/>
+<circle cx="172" cy="278" r="5" fill="#888780"/>
+<circle cx="234" cy="278" r="5" fill="#888780"/>
+<circle cx="296" cy="278" r="5" fill="#888780"/>
+<circle cx="358" cy="278" r="5" fill="#888780"/>
+<circle cx="420" cy="278" r="5" fill="#185FA5"/>
+<circle cx="482" cy="278" r="5" fill="#185FA5"/>
+<text x="451" y="303" font-size="11" fill="#185FA5" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">你的提交</text>
+</svg>
