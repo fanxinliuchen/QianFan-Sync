@@ -255,6 +255,24 @@ git push --force-with-lease origin dev
 
 ## 九、常见问题
 
+**Q：`master` 和 `dev` 能合并吗？**
+不用合，也没东西可合。`dev` 是从 `master` 长出来的，天然包含 `master` 的全部提交——在 `dev` 上执行 `git merge master` 只会返回 `Already up to date.`，什么都不发生。
+反过来把 `dev` 合进 `master` 是有害的：镜像就失真了，`git status` 再也看不出落后官方多少，网页上点 Sync fork 还会提示丢弃提交。
+上游更新后要做的是**变基**（`./sync-upstream.sh` 已封装），不是合并。
+
+**Q：万一我把 `dev` 合进 `master` 搞坏了？**
+`master` 不承载任何独有信息，纯粹是官方的倒影，所以随时可以重建：
+```bash
+git checkout master
+git fetch upstream
+git reset --hard upstream/master
+git push -f origin master
+```
+重建完再切回 `dev` 继续干活。这也是为什么不要在 `master` 上放任何自己的东西——它随时会被冲掉，本来就该如此。
+
+**Q：那就只留 `dev` 一个分支行不行？**
+行。本地 `master` 不是必需的，`upstream/master` 这个远程引用就够算了（`git rev-list --count upstream/master..dev`）。但建议留着：一是 `git status` 能直接告诉你落后多少，二是给别人解释这套流程时有个直观的参照物，成本也就是一个指针。
+
 **Q：同步后发现改坏了，怎么回退？**
 每次同步前脚本会自动打一个 `sync-backup-<时间戳>` 标签：
 ```bash
